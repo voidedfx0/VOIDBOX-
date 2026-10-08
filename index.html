@@ -117,7 +117,7 @@
 const state={balance:0,today:0,total:0,adsWatched:0,activity:[],campaigns:[]};
 const $=id=>document.getElementById(id);
 const balance=$('balance'),usd=$('usd'),today=$('today'),adCount=$('adCount'),activityList=$('activityList'),toast=$('toast');
-function render(){balance.textContent=state.balance+' ZEC';usd.textContent='
+function render(){balance.textContent=state.balance+' ZEC';usd.textContent='$'+(state.balance*.0001).toFixed(2)+' USD';today.textContent=state.today+' ZEC';adCount.textContent=state.adsWatched+' / 10 ads today';$('walletBalance').textContent=state.balance+' ZEC';$('accountTotal').textContent=state.total+' ZEC';renderCampaigns()}
 function renderActivity(){activityList.innerHTML=state.activity.length?state.activity.map(x=>'<div class="activity-row"><div><strong>'+x.type+'</strong><small>'+x.time+'</small></div><b>+'+x.amount+' ZEC</b></div>').join(''):'<div class="empty">No activity yet</div>'}
 function toastMsg(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastMsg.timer);toastMsg.timer=setTimeout(()=>toast.classList.remove('show'),2400)}
 const adModal=$('adModal'),timer=$('timer'),adReward=$('adReward'),startAd=$('startAd'),claimAd=$('claimAd');let adTimer=null,running=false;
