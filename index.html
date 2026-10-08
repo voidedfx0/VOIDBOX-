@@ -93,6 +93,53 @@
 </style><style>
 /* Keep mobile dashboard cards fixed when rewards update */
 @media(max-width:800px){.cards{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:stretch}.cards .card{min-width:0;height:220px;padding:22px;overflow:hidden}.cards .balance,.cards .stat{min-height:220px;height:220px}.cards .amount{font-size:clamp(28px,9vw,45px);white-space:nowrap}}
+</style><style>
+/* HARD LOCK: mobile dashboard cards must never resize or scale */
+@media(max-width:800px){
+  .cards{
+    display:grid!important;
+    grid-template-columns:calc(60% - 8px) calc(40% - 8px)!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    gap:16px!important;
+    align-items:stretch!important;
+  }
+  .cards>.card{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:220px!important;
+    min-height:220px!important;
+    max-height:220px!important;
+    box-sizing:border-box!important;
+    flex:none!important;
+    transform:none!important;
+  }
+  .cards>.balance,
+  .cards>.stat{
+    width:100%!important;
+    height:220px!important;
+    min-height:220px!important;
+    max-height:220px!important;
+  }
+  .cards .amount{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    font-size:clamp(24px,8vw,45px)!important;
+    line-height:1.1!important;
+  }
+  .cards .balance:active,
+  .cards .stat:active,
+  .cards .card:active{
+    transform:none!important;
+    scale:1!important;
+  }
+}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar"><div class="logo">ZEC<span>BOX</span></div><nav class="nav"><button class="active" id="dashboardNav">◈ Dashboard</button><button id="earnNav">✦ Earn from Ads</button><button id="walletNav">▣ Wallet</button><button id="activityNav">≡ Activity</button><button id="accountNav">◎ Account</button><button id="createAdNav">＋ Create Ad</button></nav></aside><main class="main"><header class="top"><div><div class="eyebrow">Welcome back</div><div class="title">Watch. Earn. Repeat.</div><div class="welcome-sub">Get rewarded for every ad you watch.</div></div><div><button class="menu secondary" id="menuBtn">☰</button> <button class="user" id="accountBtn">ZEC User</button></div></header><section class="cards"><div class="card balance"><div class="zec-rain" aria-hidden="true"><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span></div><div class="label">Available Balance</div><div class="amount" id="balance">0 ZEC</div><div class="usd" id="usd">$0.00 USD</div></div><div class="card stat"><div class="label">Today Earned</div><strong id="today">0 ZEC</strong></div></section><section class="section" id="earnSection"><h2>Start earning</h2><div class="card earn-card"><div style="display:flex;gap:16px;align-items:center"><div class="earn-icon">▶</div><div class="earn-info"><h3>Earn from Ads</h3><p>Watch a short ad session and claim your ZEC reward when the timer finishes.</p></div></div><div class="earn-right"><strong id="adCount">0 / 10 ads today</strong><button class="primary" id="watchAdBtn">Watch Ad</button></div></div></section><section class="section" id="advertiserSection">
 <div class="advertiser-close-row"><button class="secondary" id="closeAdvertiser">Close Advertiser Center</button></div>
 <div class="section-head"><div><h2>Advertiser Center</h2><p class="section-sub">Create campaigns and reach ZEC BOX users.</p></div></div>
