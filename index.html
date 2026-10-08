@@ -89,25 +89,136 @@
 <div class="toast" id="toast"></div><nav class="mobile-bar"><button id="mobileHome"><b>⌂</b>Home</button><button id="mobileEarn"><b>✦</b>Earn</button><button id="mobileWallet"><b>▣</b>Wallet</button><button id="mobileAccount"><b>◎</b>Account</button></nav></div>
 <script>
 (function(){
-  'use strict';
+'use strict';
 
-  const state = {
-    balance: 0,
-    today: 0,
-    total: 0,
-    adsWatched: 0,
-    activity: []
-  };
+const state={balance:0,today:0,total:0,adsWatched:0,activity:[]};
+const $=id=>document.getElementById(id);
 
-  const $ = id => document.getElementById(id);
+const balance=$('balance');
+const usd=$('usd');
+const today=$('today');
+const adCount=$('adCount');
+const activityList=$('activityList');
+const toast=$('toast');
 
-  const balance = $('balance');
-  const usd = $('usd');
-  const today = $('today');
-  const adCount = $('adCount');
-  const activityList = $('activityList');
-  const toast = $('toast');
+function render(){
+  balance.textContent=state.balance+' ZEC';
+  usd.textContent='$'+(state.balance*0.0001).toFixed(2)+' USD';
+  today.textContent=state.today+' ZEC';
+  adCount.textContent=state.adsWatched+' / 10 ads today';
+  $('walletBalance').textContent=state.balance+' ZEC';
+  $('accountTotal').textContent=state.total+' ZEC';
+}
 
-  function render(){
-    balance.textContent = state.balance + ' ZEC';
-    usd.textContent = '</body></html>
+function renderActivity(){
+  activityList.innerHTML=state.activity.length
+    ? state.activity.map(x=>'<div class="activity-row"><div><strong>'+x.type+'</strong><small>'+x.time+'</small></div><b>+'+x.amount+' ZEC</b></div>').join('')
+    : '<div class="empty">No activity yet</div>';
+}
+
+function showToast(message){
+  toast.textContent=message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer=setTimeout(()=>toast.classList.remove('show'),2400);
+}
+
+const adModal=$('adModal');
+const timer=$('timer');
+const adReward=$('adReward');
+const startAd=$('startAd');
+const claimAd=$('claimAd');
+let adTimer=null;
+let running=false;
+
+function openAd(){
+  if(state.adsWatched>=10){showToast('Daily ad limit reached.');return}
+  adModal.classList.add('show');
+  timer.textContent='10';
+  adReward.textContent='';
+  startAd.style.display='inline-block';
+  claimAd.style.display='none';
+}
+
+function closeAd(){
+  if(adTimer){clearInterval(adTimer);adTimer=null}
+  running=false;
+  adModal.classList.remove('show');
+}
+
+function startSession(){
+  if(running||state.adsWatched>=10)return;
+  window.open('https://www.profitableratecpmnetwork.com/mdssdmjef?key=0e50a2162cfb6fcb04f04c302baec9cb','_blank','noopener,noreferrer');
+  running=true;
+  startAd.style.display='none';
+  let seconds=10;
+  timer.textContent=seconds;
+  adTimer=setInterval(()=>{
+    seconds--;
+    timer.textContent=seconds;
+    if(seconds<=0){
+      clearInterval(adTimer);
+      adTimer=null;
+      running=false;
+      claimAd.style.display='inline-block';
+      adReward.textContent='Ad complete. Claim your +20 ZEC reward.';
+    }
+  },1000);
+}
+
+function claim(){
+  if(running||state.adsWatched>=10)return;
+  state.adsWatched++;
+  state.balance+=20;
+  state.today+=20;
+  state.total+=20;
+  state.activity.unshift({
+    amount:20,
+    type:'Ad completed',
+    time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+  });
+  render();
+  renderActivity();
+  adReward.textContent='+20 ZEC added to your balance.';
+  claimAd.style.display='none';
+  startAd.style.display='inline-block';
+  showToast('Ad completed — +20 ZEC');
+}
+
+function backdrop(event){
+  if(event.target===event.currentTarget)event.currentTarget.classList.remove('show');
+}
+
+$('watchAdBtn').onclick=openAd;
+$('earnNav').onclick=openAd;
+startAd.onclick=startSession;
+claimAd.onclick=claim;
+$('closeAd').onclick=closeAd;
+adModal.onclick=backdrop;
+
+const walletModal=$('walletModal');
+$('walletNav').onclick=()=>walletModal.classList.add('show');
+$('closeWallet').onclick=()=>walletModal.classList.remove('show');
+walletModal.onclick=backdrop;
+
+const accountModal=$('accountModal');
+function account(){accountModal.classList.add('show');render()}
+$('accountNav').onclick=account;
+$('accountBtn').onclick=account;
+$('closeAccount').onclick=()=>accountModal.classList.remove('show');
+accountModal.onclick=backdrop;
+
+$('activityNav').onclick=()=>$('activitySection').scrollIntoView({behavior:'smooth'});
+$('dashboardNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+$('menuBtn').onclick=()=>$('sidebar').classList.toggle('open');
+$('mobileHome').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+$('mobileEarn').onclick=openAd;
+$('mobileWallet').onclick=()=>walletModal.classList.add('show');
+$('mobileAccount').onclick=account;
+
+render();
+renderActivity();
+})();
+</script>
+</body>
+</html>
