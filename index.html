@@ -96,30 +96,43 @@ document.getElementById('finishAd').onclick=finishAd;
 const spinRewards=[5,10,15,20,25,50,100];
 let spinsLeft=3,spinning=false;
 function openSpin(){
-  document.getElementById('spinModal').classList.add('show');
+  const modal=document.getElementById('spinModal');
+  modal.classList.add('show');
   document.getElementById('spinsLeft').textContent=spinsLeft;
   document.getElementById('spinResult').textContent='';
+  document.getElementById('wheelValue').textContent='?';
 }
 function closeSpin(){document.getElementById('spinModal').classList.remove('show')}
 function doSpin(){
   if(spinning)return;
   if(spinsLeft<=0){showToast('No free spins left today.');return}
-  spinning=true;spinsLeft--;
-  const btn=document.getElementById('spinButton'),result=document.getElementById('spinResult'),wheel=document.getElementById('wheelValue');
-  btn.disabled=true;result.textContent='Spinning...';
+  spinning=true;
+  spinsLeft--;
+  const btn=document.getElementById('spinButton');
+  const result=document.getElementById('spinResult');
+  const wheel=document.getElementById('wheelValue');
+  const left=document.getElementById('spinsLeft');
+  btn.disabled=true;
+  left.textContent=spinsLeft;
+  result.textContent='Spinning...';
+
   let ticks=0;
-  const t=setInterval(()=>{
+  const timer=setInterval(()=>{
     wheel.textContent=spinRewards[Math.floor(Math.random()*spinRewards.length)]+' VOID';
     ticks++;
     if(ticks>=6){
-      clearInterval(t);
+      clearInterval(timer);
       const win=spinRewards[Math.floor(Math.random()*spinRewards.length)];
       wheel.textContent=win+' VOID';
-      state.balance+=win;state.today+=win;state.total+=win;state.lastSpin='+'+win+' VOID';
-      addActivity(win,'Spin reward');render();
+      state.balance+=win;
+      state.today+=win;
+      state.total+=win;
+      state.lastSpin='+'+win+' VOID';
+      addActivity(win,'Spin reward');
+      render();
       result.textContent='You won +'+win+' VOID!';
-      document.getElementById('spinsLeft').textContent=spinsLeft;
-      btn.disabled=false;spinning=false;
+      btn.disabled=false;
+      spinning=false;
       showToast('Spin reward: +'+win+' VOID');
     }
   },70);
