@@ -105,7 +105,7 @@ security definer
 set search_path = ''
 as $$
 begin
-  if old.status = 'pending' and new.status = 'rejected' then
+  if old.status in ('pending','approved') and new.status = 'rejected' then
     if new.currency = 'ZEC' then
       update public.wallet_balances set zec_balance = zec_balance + new.amount, updated_at = now() where user_id = new.user_id;
     elsif new.currency = 'USDT' then
@@ -115,7 +115,7 @@ begin
        set status = 'refunded'
      where user_id = new.user_id and reference = 'withdrawal:'||new.id::text and status = 'pending';
     new.reviewed_at := coalesce(new.reviewed_at,now());
-  elsif old.status = 'pending' and new.status in ('approved','paid') then
+  elsif old.status in ('pending','approved') and new.status in ('approved','paid') and old.status is distinct from new.status then
     new.reviewed_at := coalesce(new.reviewed_at,now());
     update public.wallet_transactions
        set status = case when new.status = 'paid' then 'completed' else 'pending' end
