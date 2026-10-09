@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZEC BOX — Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{color-scheme:dark;--bg:#08090e;--panel:#11131b;--line:#282c38;--text:#f5f6fb;--muted:#9aa1b2;--purple:#7c3aed;--green:#a7f3d0;--red:#fca5a5;--amber:#fcd34d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#1b1230,transparent 35%),var(--bg);color:var(--text);font:14px Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input{font:inherit}.wrap{max-width:1280px;margin:auto;padding:28px 22px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}.brand{font-size:23px;font-weight:800;letter-spacing:-.8px}.brand span{color:#a78bfa}.tag{font-size:11px;color:var(--muted);margin-top:5px}.panel{background:linear-gradient(145deg,#12151d,#0c0e14);border:1px solid var(--line);border-radius:18px;padding:22px}.login{max-width:440px;margin:8vh auto}.h{font-size:23px;font-weight:750;margin:0 0 8px}.muted{color:var(--muted);line-height:1.55}.field{display:grid;gap:7px;margin:16px 0}.field label{font-size:12px;color:#c3c8d4}.field input{width:100%;padding:12px 13px;background:#080a10;border:1px solid #343847;border-radius:10px;color:white;outline:none}.field input:focus{border-color:#8b5cf6}.btn{border:1px solid #343847;background:#1a1d27;color:white;border-radius:10px;padding:10px 13px;cursor:pointer;font-weight:650}.btn.primary{background:var(--purple);border-color:var(--purple)}.btn:disabled{opacity:.5;cursor:wait}.msg{font-size:12px;line-height:1.5;white-space:pre-wrap;margin-top:13px;color:var(--muted);overflow-wrap:anywhere}.error{color:var(--red)}.notice{padding:14px;border:1px solid #51421b;background:#201a0c;border-radius:12px;color:#f8df9b;margin:16px 0;line-height:1.55}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}.stat{background:#11131b;border:1px solid var(--line);border-radius:14px;padding:17px}.stat span{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:27px;margin-top:8px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0 14px}.toolbar h2{font-size:19px;margin:0}.filters{display:flex;gap:7px;flex-wrap:wrap}.filters button{font-size:12px}.filters button.active{border-color:#8b5cf6;background:#261a3e}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:980px;background:#0e1016}th,td{text-align:left;padding:14px 13px;border-bottom:1px solid #242733;vertical-align:top}th{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:#13151d}td{font-size:12px;line-height:1.55}tr:last-child td{border-bottom:0}.addr{max-width:220px;overflow-wrap:anywhere;color:#d7d9e2}.email{overflow-wrap:anywhere}.status{display:inline-flex;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase}.pending{color:var(--amber);background:#3a2c0e}.approved{color:#c4b5fd;background:#2b1c45}.paid{color:var(--green);background:#123027}.rejected{color:var(--red);background:#3b1b23}.actions{display:flex;gap:6px;flex-wrap:wrap;min-width:150px}.actions .btn{padding:7px 9px;font-size:11px}.green{border-color:#28664e;color:var(--green)}.red{border-color:#6b2d38;color:var(--red)}.empty{text-align:center;color:var(--muted);padding:30px}.hidden{display:none!important}.bottom-note{font-size:11px;color:var(--muted);margin-top:15px;line-height:1.6}
+@media(max-width:650px){.wrap{padding:18px 12px 40px}.top{align-items:flex-start}.panel{padding:17px}.stats{grid-template-columns:1fr}.stat strong{font-size:23px}.login{margin:4vh auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div><div class="brand">ZEC <span>BOX</span> <span style="color:#9aa1b2;font-size:13px;letter-spacing:0">/ ADMIN</span></div><div class="tag">Private withdrawal review console</div></div><button id="signOut" class="btn hidden">Sign out</button></header>
+<section id="loginPanel" class="panel login">
+<h1 class="h">Administrator sign in</h1>
+<p class="muted">Use your existing ZEC BOX account. Only accounts explicitly authorized in the database can access withdrawal records.</p>
+<form id="loginForm"><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginBtn" class="btn primary" type="submit">Sign in securely</button></form>
+<div id="loginMsg" class="msg" aria-live="polite"></div>
+</section>
+<section id="deniedPanel" class="panel hidden">
+<h1 class="h">Admin access not enabled</h1><p class="muted">You are signed in, but this account is not on the administrator allowlist. Copy your User ID and add it to <code>public.admin_users</code> in Supabase only if this is your trusted administrator account.</p>
+<div class="notice"><strong>Your User ID</strong><div id="userId" style="margin-top:8px;overflow-wrap:anywhere"></div><button id="copyId" class="btn" style="margin-top:10px">Copy User ID</button></div>
+<button id="checkAgain" class="btn primary">Check admin access again</button><div id="deniedMsg" class="msg"></div>
+</section>
+<section id="dashboard" class="hidden">
+<div class="notice">Manual payout workflow: approve a request before paying it. Mark it <strong>Paid</strong> only after you have actually sent the funds. Rejecting a request triggers the configured automatic refund.</div>
+<div class="stats"><div class="stat"><span>Pending review</span><strong id="pendingCount">—</strong></div><div class="stat"><span>Approved, awaiting payout</span><strong id="approvedCount">—</strong></div><div class="stat"><span>Paid / rejected</span><strong id="closedCount">—</strong></div></div>
+<div class="toolbar"><h2>Withdrawal requests</h2><div class="filters"><button class="btn active" data-filter="all">All</button><button class="btn" data-filter="pending">Pending</button><button class="btn" data-filter="approved">Approved</button><button class="btn" data-filter="paid">Paid</button><button class="btn" data-filter="rejected">Rejected</button><button id="refresh" class="btn">Refresh</button></div></div>
+<div id="tableWrap" class="table-wrap"><div class="empty">Loading requests…</div></div>
+<p class="bottom-note">This page never holds a service-role key. All privileged reads and status changes are checked by Supabase database functions. Wallet transfers are manual and must be independently verified.</p>
+<div id="dashMsg" class="msg" aria-live="polite"></div>
+</section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://cvayjxaaqaamgqhcrakb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_xY03L2wm9qaC9fZPK_-wtw_Z--j3446';
+const client=window.supabase&&window.supabase.createClient?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+const $=id=>document.getElementById(id);
+let requests=[],filter='all',activeUser=null;
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function message(id,text,error){$(id).textContent=text||'';$(id).classList.toggle('error',!!error)}
+function show(which){['loginPanel','deniedPanel','dashboard'].forEach(id=>$(id).classList.toggle('hidden',id!==which));$('signOut').classList.toggle('hidden',!activeUser)}
+async function checkAccess(user){
+ activeUser=user||null;
+ if(!user){show('loginPanel');return}
+ $('userId').textContent=user.id;
+ show('deniedPanel');message('deniedMsg','Checking administrator permission…');
+ const {data,error}=await client.rpc('is_current_user_admin');
+ if(error){message('deniedMsg','Could not verify admin access. Run the admin migration in Supabase, then try again. '+error.message,true);return}
+ if(data===true){show('dashboard');await loadRequests()}else{show('deniedPanel');message('deniedMsg','This account is not authorized yet.')}
+}
+async function loadRequests(){
+ $('tableWrap').innerHTML='<div class="empty">Loading withdrawal requests…</div>';
+ $('refresh').disabled=true;message('dashMsg','');
+ try{
+  const {data,error}=await client.rpc('admin_list_withdrawals');
+  if(error)throw error;
+  requests=Array.isArray(data)?data:[];
+  $('pendingCount').textContent=requests.filter(x=>x.status==='pending').length;
+  $('approvedCount').textContent=requests.filter(x=>x.status==='approved').length;
+  $('closedCount').textContent=requests.filter(x=>['paid','rejected'].includes(x.status)).length;
+  renderRows();
+ }catch(err){$('tableWrap').innerHTML='<div class="empty">Could not load requests.</div>';message('dashMsg',err.message||'Request failed.',true)}
+ finally{$('refresh').disabled=false}
+}
+function statusPill(status){return '<span class="status '+escapeHtml(status)+'">'+escapeHtml(status)+'</span>'}
+function actionButtons(r){
+ let out='';
+ if(r.status==='pending')out+='<button class="btn green" data-status="approved" data-id="'+escapeHtml(r.id)+'">Approve</button><button class="btn red" data-status="rejected" data-id="'+escapeHtml(r.id)+'">Reject</button>';
+ if(r.status==='approved')out+='<button class="btn green" data-status="paid" data-id="'+escapeHtml(r.id)+'">Mark paid</button><button class="btn red" data-status="rejected" data-id="'+escapeHtml(r.id)+'">Reject</button>';
+ return out||'<span class="muted">Finalized</span>';
+}
+function renderRows(){
+ const rows=requests.filter(r=>filter==='all'||r.status===filter);
+ if(!rows.length){$('tableWrap').innerHTML='<div class="empty">No '+(filter==='all'?'withdrawal':escapeHtml(filter))+' requests found.</div>';return}
+ $('tableWrap').innerHTML='<table><thead><tr><th>Request / Date</th><th>User</th><th>Amount</th><th>Destination</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+rows.map(r=>'<tr><td><strong>'+escapeHtml(String(r.id).slice(0,8))+'</strong><br><span class="muted">'+escapeHtml(new Date(r.created_at).toLocaleString())+'</span></td><td class="email">'+escapeHtml(r.user_email||'Email unavailable')+'<br><span class="muted">'+escapeHtml(String(r.user_id).slice(0,12))+'…</span></td><td><strong>'+escapeHtml(Number(r.amount).toString())+' '+escapeHtml(r.currency)+'</strong><br><span class="muted">'+escapeHtml(r.network)+'</span></td><td><div class="addr">'+escapeHtml(r.wallet_address)+'</div><button class="btn" style="margin-top:7px" data-copy="'+escapeHtml(r.id)+'">Copy address</button></td><td>'+statusPill(r.status)+(r.reviewed_at?'<br><span class="muted">'+escapeHtml(new Date(r.reviewed_at).toLocaleString())+'</span>':'')+'</td><td><div class="actions">'+actionButtons(r)+'</div></td></tr>').join('')+'</tbody></table>';
+}
+async function updateStatus(id,status){
+ const r=requests.find(x=>x.id===id);if(!r)return;
+ const prompts={approved:'Approve this withdrawal? Funds remain reserved.',rejected:'Reject this withdrawal? The database will refund the reserved balance.',paid:'Confirm you have already sent '+r.amount+' '+r.currency+' to the destination wallet. Mark as paid?'};
+ if(!window.confirm(prompts[status]||'Continue?'))return;
+ message('dashMsg','Updating withdrawal…');
+ const buttons=document.querySelectorAll('[data-id="'+CSS.escape(id)+'"]');buttons.forEach(b=>b.disabled=true);
+ try{const {error}=await client.rpc('admin_update_withdrawal_status',{p_request_id:id,p_status:status});if(error)throw error;await loadRequests();message('dashMsg','Withdrawal updated to '+status+'.')}
+ catch(err){message('dashMsg',err.message||'Could not update withdrawal.',true);buttons.forEach(b=>b.disabled=false)}
+}
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!client){message('loginMsg','Supabase could not load. Refresh and try again.',true);return}
+ $('loginBtn').disabled=true;message('loginMsg','Signing in…');
+ try{const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;await checkAccess(data.user)}
+ catch(err){message('loginMsg',err.message||'Sign in failed.',true)}
+ finally{$('loginBtn').disabled=false}
+});
+$('signOut').onclick=async()=>{if(client)await client.auth.signOut();activeUser=null;requests=[];show('loginPanel')};
+$('checkAgain').onclick=()=>activeUser&&checkAccess(activeUser);
+$('copyId').onclick=async()=>{try{await navigator.clipboard.writeText($('userId').textContent);message('deniedMsg','User ID copied.')}catch(e){message('deniedMsg','Select and copy the User ID shown above.')}};
+$('refresh').onclick=loadRequests;
+document.querySelector('.filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderRows()});
+$('tableWrap').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.status){await updateStatus(b.dataset.id,b.dataset.status);return}if(b.dataset.copy){const r=requests.find(x=>x.id===b.dataset.copy);if(!r)return;try{await navigator.clipboard.writeText(r.wallet_address);message('dashMsg','Wallet address copied.')}catch(err){message('dashMsg','Could not access clipboard; select the address manually.',true)}}});
+if(client)client.auth.getSession().then(({data})=>{if(data.session)checkAccess(data.session.user)}).catch(()=>{});
+})();
+</script>
+</body>
+</html>
