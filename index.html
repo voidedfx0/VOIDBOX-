@@ -277,7 +277,7 @@ function renderSignupCaptcha(){
   if(!window.turnstile){turnstileRenderPending=true;setTimeout(()=>{turnstileRenderPending=false;if(authMode==='signup')renderSignupCaptcha()},500);return}
   try{
     turnstileWidgetId=window.turnstile.render('#turnstileWidget',{
-      sitekey:'0x4AAAAAAFSrtCaDrBRwG6_H',
+      sitekey:'0x4AAAAAAFSrtCaDrBRW6_G',
       theme:'dark',
       callback:()=>setAuthMessage('Security check completed.'),
       'expired-callback':()=>setAuthMessage('Security check expired. Please complete it again.',true),
