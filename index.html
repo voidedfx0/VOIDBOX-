@@ -251,8 +251,8 @@ function startAmbientMusic(){
   try{
     musicContext=new AudioCtx();musicMaster=musicContext.createGain();musicMaster.gain.value=.16;musicMaster.connect(musicContext.destination);
     [174.61,220,261.63].forEach((freq,i)=>{const osc=musicContext.createOscillator(),gain=musicContext.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.value=[.25,.18,.12][i];osc.connect(gain);gain.connect(musicMaster);osc.start();musicNodes.push(osc)});
-    const playNote=()=>{if(!musicContext||!musicMaster)return;const osc=musicContext.createOscillator(),gain=musicContext.createGain(),now=musicContext.currentTime;osc.type='sine';osc.frequency.value=musicNotes[musicStep%musicNotes.length];gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.18,now+.35);gain.gain.exponentialRampToValueAtTime(.0001,now+2.1);osc.connect(gain);gain.connect(musicMaster);osc.start(now);osc.stop(now+2.2);musicNodes.push(osc);musicStep++;if(musicNodes.length>18)musicNodes=musicNodes.slice(-15)};
-    playNote();musicTimer=setInterval(playNote,2300);return true;
+    const playNote=()=>{if(!musicContext||!musicMaster)return;const now=musicContext.currentTime,freq=musicNotes[musicStep%musicNotes.length];[[1,.20],[2,.045],[3,.018]].forEach(([harmonic,level])=>{const osc=musicContext.createOscillator(),gain=musicContext.createGain();osc.type='triangle';osc.frequency.setValueAtTime(freq*harmonic,now);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(level,now+.012);gain.gain.exponentialRampToValueAtTime(level*.35,now+.16);gain.gain.exponentialRampToValueAtTime(.0001,now+1.55);osc.connect(gain);gain.connect(musicMaster);osc.start(now);osc.stop(now+1.6);musicNodes.push(osc)});musicStep++;if(musicNodes.length>48)musicNodes=musicNodes.slice(-39)};
+    playNote();musicTimer=setInterval(playNote,720);return true;
   }catch(e){stopAmbientMusic();toastMsg('Could not start background music.');return false}
 }
 $('musicToggle').addEventListener('click',async()=>{
