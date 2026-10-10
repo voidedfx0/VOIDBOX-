@@ -238,7 +238,7 @@ const state={balance:0,today:0,total:0,adsWatched:0,activity:[],campaigns:[]};
 const $=id=>document.getElementById(id);
 // Gentle, synthesized ambient music; starts only after the user taps the control.
 let musicContext=null,musicMaster=null,musicNodes=[],musicTimer=null,musicStep=0;
-const musicNotes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23,261.63,329.63,392,493.88];
+const musicNotes=[523.25,392,440,523.25,659.25,587.33,523.25,440,392,329.63,392,523.25,493.88,440,392,329.63];
 function stopAmbientMusic(){
   if(musicTimer){clearInterval(musicTimer);musicTimer=null}
   musicNodes.forEach(node=>{try{node.stop()}catch(e){}});
@@ -249,7 +249,7 @@ function startAmbientMusic(){
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
   if(!AudioCtx){toastMsg('Background music is not supported in this browser.');return false}
   try{
-    musicContext=new AudioCtx();musicMaster=musicContext.createGain();musicMaster.gain.value=.12;musicMaster.connect(musicContext.destination);
+    musicContext=new AudioCtx();musicMaster=musicContext.createGain();musicMaster.gain.value=.16;musicMaster.connect(musicContext.destination);
     [174.61,220,261.63].forEach((freq,i)=>{const osc=musicContext.createOscillator(),gain=musicContext.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.value=[.25,.18,.12][i];osc.connect(gain);gain.connect(musicMaster);osc.start();musicNodes.push(osc)});
     const playNote=()=>{if(!musicContext||!musicMaster)return;const osc=musicContext.createOscillator(),gain=musicContext.createGain(),now=musicContext.currentTime;osc.type='sine';osc.frequency.value=musicNotes[musicStep%musicNotes.length];gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.18,now+.35);gain.gain.exponentialRampToValueAtTime(.0001,now+2.1);osc.connect(gain);gain.connect(musicMaster);osc.start(now);osc.stop(now+2.2);musicNodes.push(osc);musicStep++;if(musicNodes.length>18)musicNodes=musicNodes.slice(-15)};
     playNote();musicTimer=setInterval(playNote,2300);return true;
