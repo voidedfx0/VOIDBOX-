@@ -224,7 +224,7 @@
 <div class="modal" id="walletModal"><div class="modal-box"><h2>Wallet</h2><p>Your wallet is currently a prototype. No real payment is processed.</p><div class="card"><div class="label">Available ZEC balance (database)</div><div class="wallet-value" id="walletBalance">0 ZEC</div><div class="label" style="margin-top:14px">USDT balance (database)</div><div class="wallet-value" id="walletUsdtBalance">0.00 USDT</div></div><p class="wallet-note">Balances are read-only in this version. No deposits, rewards, or withdrawals are processed yet.</p><div class="modal-actions"><button class="secondary" id="closeWallet">Close</button></div></div></div>
 <div class="modal" id="accountModal"><div class="modal-box"><h2>Account</h2><p>Your ZEC BOX sign-in and profile.</p><div class="account-line"><span>User</span><strong id="accountDisplayName">Signed out</strong></div><div class="account-line"><span>Email</span><strong id="accountEmail">Not signed in</strong></div><div class="account-line"><span>Account status</span><strong id="accountStatus">Not signed in</strong></div><div class="account-line"><span>Database wallet balance</span><strong id="accountTotal">0 ZEC</strong></div><p class="wallet-note">Your displayed ZEC balance is read from the database. USDT balance and all earning, deposit, and withdrawal actions remain unavailable until secure processing is added.</p><div class="modal-actions"><button class="secondary auth-signout" id="signOutBtn">Sign out</button><button class="secondary" id="closeAccount">Close</button></div></div></div>
 <div class="modal show auth-modal" id="authModal"><div class="modal-box"><h2 id="authTitle">Welcome to ZEC BOX</h2><p id="authIntro">Sign in to your account, or create one to get started. Email confirmation may be required.</p><form id="authForm"><div class="auth-field" id="displayNameField" style="display:none"><label for="authDisplayName">Display name</label><input id="authDisplayName" autocomplete="name" maxlength="60" placeholder="Your name"></div><div class="auth-field"><label for="authEmail">Email address</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="auth-field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></div><div class="turnstile-wrap" id="turnstileWrap"><div id="turnstileWidget"></div><div class="turnstile-help">Complete this security check to create an account.</div></div><div class="auth-note" id="authMessage" role="status" aria-live="polite"></div><button class="primary" id="authSubmit" type="submit" style="width:100%">Sign in</button></form><button class="auth-switch" id="authModeBtn" type="button">New here? Create an account</button><button class="auth-switch" id="resetPasswordBtn" type="button">Forgot password?</button><p class="wallet-note">Security note: never share your password or private wallet keys. This account currently does not enable real deposits, ad rewards, or withdrawals.</p></div></div>
-<div class="toast" id="toast"></div><button class="music-toggle" id="musicToggle" type="button" aria-pressed="false" aria-label="Turn background music on"><span aria-hidden="true">♫</span><span id="musicToggleLabel">Ambient music off</span><span class="music-dot" aria-hidden="true"></span></button><nav class="mobile-bar"><button id="mobileHome"><b>⌂</b>Home</button><button id="mobileEarn"><b>✦</b>Earn</button><button id="mobileWallet"><b>▣</b>Wallet</button><button id="mobileAccount"><b>◎</b>Account</button></nav></div>
+<div class="toast" id="toast"></div><audio id="backgroundMusic" src="./music.mp3" loop preload="none"></audio><button class="music-toggle" id="musicToggle" type="button" aria-pressed="false" aria-label="Turn background music on"><span aria-hidden="true">♫</span><span id="musicToggleLabel">Ambient music off</span><span class="music-dot" aria-hidden="true"></span></button><nav class="mobile-bar"><button id="mobileHome"><b>⌂</b>Home</button><button id="mobileEarn"><b>✦</b>Earn</button><button id="mobileWallet"><b>▣</b>Wallet</button><button id="mobileAccount"><b>◎</b>Account</button></nav></div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
@@ -236,29 +236,29 @@ let currentUser=null,authMode='signin',databaseZecBalance=null,databaseUsdtBalan
 const state={balance:0,today:0,total:0,adsWatched:0,activity:[],campaigns:[]};
 
 const $=id=>document.getElementById(id);
-// Gentle, synthesized ambient music; starts only after the user taps the control.
-let musicContext=null,musicMaster=null,musicNodes=[],musicTimer=null,musicStep=0;
-const musicNotes=[523.25,392,440,523.25,659.25,587.33,523.25,440,392,329.63,392,523.25,493.88,440,392,329.63];
+// Licensed cinematic piano MP3; starts only after the user taps the control.
+const backgroundMusic=$('backgroundMusic');
 function stopAmbientMusic(){
-  if(musicTimer){clearInterval(musicTimer);musicTimer=null}
-  musicNodes.forEach(node=>{try{node.stop()}catch(e){}});
-  musicNodes=[];if(musicContext){musicContext.close().catch(()=>{});musicContext=null}
-  musicMaster=null;musicStep=0;
-}
-function startAmbientMusic(){
-  const AudioCtx=window.AudioContext||window.webkitAudioContext;
-  if(!AudioCtx){toastMsg('Background music is not supported in this browser.');return false}
-  try{
-    musicContext=new AudioCtx();musicMaster=musicContext.createGain();musicMaster.gain.value=.16;musicMaster.connect(musicContext.destination);
-    [174.61,220,261.63].forEach((freq,i)=>{const osc=musicContext.createOscillator(),gain=musicContext.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.value=[.25,.18,.12][i];osc.connect(gain);gain.connect(musicMaster);osc.start();musicNodes.push(osc)});
-    const playNote=()=>{if(!musicContext||!musicMaster)return;const now=musicContext.currentTime,freq=musicNotes[musicStep%musicNotes.length];[[1,.20],[2,.045],[3,.018]].forEach(([harmonic,level])=>{const osc=musicContext.createOscillator(),gain=musicContext.createGain();osc.type='triangle';osc.frequency.setValueAtTime(freq*harmonic,now);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(level,now+.012);gain.gain.exponentialRampToValueAtTime(level*.35,now+.16);gain.gain.exponentialRampToValueAtTime(.0001,now+1.55);osc.connect(gain);gain.connect(musicMaster);osc.start(now);osc.stop(now+1.6);musicNodes.push(osc)});musicStep++;if(musicNodes.length>48)musicNodes=musicNodes.slice(-39)};
-    playNote();musicTimer=setInterval(playNote,720);return true;
-  }catch(e){stopAmbientMusic();toastMsg('Could not start background music.');return false}
+  backgroundMusic.pause();
+  backgroundMusic.currentTime=0;
 }
 $('musicToggle').addEventListener('click',async()=>{
   const button=$('musicToggle'),label=$('musicToggleLabel'),on=button.getAttribute('aria-pressed')==='true';
-  if(on){stopAmbientMusic();button.setAttribute('aria-pressed','false');button.setAttribute('aria-label','Turn background music on');label.textContent='Ambient music off';return}
-  if(startAmbientMusic()){if(musicContext&&musicContext.state==='suspended')await musicContext.resume();button.setAttribute('aria-pressed','true');button.setAttribute('aria-label','Turn background music off');label.textContent='Ambient music on'}
+  if(on){
+    stopAmbientMusic();
+    button.setAttribute('aria-pressed','false');
+    button.setAttribute('aria-label','Turn background music on');
+    label.textContent='Piano music off';
+    return;
+  }
+  try{
+    await backgroundMusic.play();
+    button.setAttribute('aria-pressed','true');
+    button.setAttribute('aria-label','Turn background music off');
+    label.textContent='Piano music on';
+  }catch(e){
+    toastMsg('Add the licensed music file named music.mp3 to the GitHub repository, then refresh.');
+  }
 });
 
 const balance=$('balance'),usd=$('usd'),today=$('today'),adCount=$('adCount'),activityList=$('activityList'),toast=$('toast');
