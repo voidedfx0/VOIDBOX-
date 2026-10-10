@@ -1,6 +1,6 @@
 -- Temporary ZEC BOX timer reward mode.
 -- This deliberately rewards a client timer, NOT a provider-verified ad view.
--- Reward value: $0.025 per claim at the configured rate of 1 ZEC = $0.20 (0.125 ZEC).
+-- Reward value: $0.04 per claim at the configured rate of 1 ZEC = $0.20 (0.2 ZEC). Five claims total $0.20/day.
 -- Replace/disable this RPC once an approved provider callback is integrated.
 -- Apply in Supabase SQL Editor. Server enforces the fixed reward and 5-per-UTC-day cap.
 
@@ -13,7 +13,7 @@ as $$
 declare
   v_user_id uuid := auth.uid();
   v_claim_count integer;
-  v_reward numeric(20,8) := 0.12500000;
+  v_reward numeric(20,8) := 0.20000000;
   v_reference text := gen_random_uuid()::text;
 begin
   if v_user_id is null then
