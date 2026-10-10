@@ -66,3 +66,6 @@ $$;
 
 revoke all on function public.claim_timer_ad_reward() from public, anon;
 grant execute on function public.claim_timer_ad_reward() to authenticated;
+
+-- Refresh Supabase REST API schema cache so the new RPC is discoverable.
+notify pgrst, 'reload schema';
