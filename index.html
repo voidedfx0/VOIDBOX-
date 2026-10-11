@@ -169,9 +169,9 @@
 @media(prefers-reduced-motion:reduce){.music-toggle{transition:none}}
 </style>
 <style id="zec-balance-spin-toggle">
-/* Tap the balance card to start or stop its slow 3D spin. */
-.cards .card.balance{cursor:pointer;touch-action:manipulation;isolation:isolate}
-.cards .card.balance:focus-visible{outline:2px solid #b7a4ff;outline-offset:4px}
+/* Tap the Today Earned card to start or stop its slow 3D spin. */
+.cards .card.stat{cursor:pointer;touch-action:manipulation;isolation:isolate}
+.cards .card.stat:focus-visible{outline:2px solid #b7a4ff;outline-offset:4px}
 @keyframes zecBalanceSlowSpin{
   0%{transform:perspective(1100px) rotateY(0deg) rotateX(0deg)}
   25%{transform:perspective(1100px) rotateY(90deg) rotateX(1deg)}
@@ -183,12 +183,12 @@
   0%,100%{box-shadow:inset 0 0 0 1px rgba(158,130,255,.42),0 0 12px rgba(124,92,255,.12),0 18px 45px rgba(0,0,0,.28)}
   50%{box-shadow:inset 0 0 0 2px rgba(205,190,255,.95),0 0 25px rgba(139,92,246,.42),0 0 42px rgba(69,209,255,.12),0 18px 45px rgba(0,0,0,.28)}
 }
-.cards .card.balance.zec-spin-active{
+.cards .card.stat.zec-spin-active{
   animation:zecBalanceSlowSpin 12s linear infinite,zecEdgeShine 2.8s ease-in-out infinite;
   transform-style:preserve-3d;
 }
-.cards .card.balance.zec-spin-active::after{animation:zecShine 2.8s ease-in-out infinite}
-@media(prefers-reduced-motion:reduce){.cards .card.balance.zec-spin-active{animation:zecEdgeShine 2.8s ease-in-out infinite}}
+.cards .card.stat.zec-spin-active::after{animation:zecShine 2.8s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.cards .card.stat.zec-spin-active{animation:zecEdgeShine 2.8s ease-in-out infinite}}
 </style>
 </head><body><div class="app"><aside class="sidebar" id="sidebar"><div class="logo">ZEC<span>BOX</span></div><nav class="nav"><button class="active" id="dashboardNav">◈ Dashboard</button><button id="earnNav">✦ Earn from Ads</button><button id="withdrawNav">↗ Withdraw</button><button id="referralNav">♧ Referrals</button><button id="mysteryNav">✧ Mystery Box</button><button id="walletNav">▣ Wallet</button><button id="activityNav">≡ Activity</button><button id="accountNav">◎ Account</button><button id="createAdNav">＋ Create Ad</button></nav></aside><main class="main"><header class="top"><div><div class="eyebrow">Welcome back</div><div class="title">Watch. Earn. Repeat.</div><div class="welcome-sub">Get rewarded for every ad you watch.</div></div><div><button class="menu secondary" id="menuBtn">☰</button> <button class="user" id="accountBtn">ZEC User</button></div></header><section class="cards"><div class="card balance"><div class="zec-rain" aria-hidden="true"><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span></div><div class="label">Available Balance</div><div class="amount" id="balance">0 ZEC</div><div class="usd" id="usd">$0.00 USD</div></div><div class="card stat"><div class="label">Today Earned</div><strong id="today">0 ZEC</strong></div></section><section class="section" id="earnSection"><h2>Start earning</h2><div class="card earn-card"><div style="display:flex;gap:16px;align-items:center"><div class="earn-icon">▶</div><div class="earn-info"><h3>Earn from Ads</h3><p>Open an ad link in a new tab. Up to five ad visits are available each day.</p></div></div><div class="earn-right"><strong id="adCount">0 / 5 ads today</strong><button class="primary" id="watchAdBtn">Watch Ad</button></div></div></section><section class="section" id="advertiserSection">
 <div class="advertiser-close-row"><button class="secondary" id="closeAdvertiser">Close Advertiser Center</button></div>
@@ -362,13 +362,13 @@ $('resetPasswordBtn').onclick=async()=>{if(!supabaseClient){setAuthMessage('Auth
 $('signOutBtn').onclick=async()=>{if(!supabaseClient)return;const r=await supabaseClient.auth.signOut();if(r.error){toastMsg('Could not sign out. Please try again.');return}updateAuthUI(null);toastMsg('Signed out.')};
 
 $('campaignList').onclick=e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=state.campaigns.find(x=>x.id===Number(b.dataset.id));if(!c)return;if(b.dataset.action==='delete'){state.campaigns=state.campaigns.filter(x=>x.id!==c.id);toastMsg('Campaign removed.')}else{c.status=c.status==='Paused'?'Active':'Paused';toastMsg(c.status==='Paused'?'Campaign paused.':'Campaign resumed.')}renderCampaigns()};
-const zecBalanceCard=document.querySelector('.cards .card.balance');
+const zecBalanceCard=document.querySelector('.cards .card.stat');
 if(zecBalanceCard){
   zecBalanceCard.setAttribute('role','button');
   zecBalanceCard.setAttribute('tabindex','0');
   zecBalanceCard.setAttribute('aria-pressed','false');
-  zecBalanceCard.setAttribute('aria-label','Start or stop the ZEC balance card spin');
-  zecBalanceCard.setAttribute('title','Tap to start or stop the slow spin');
+  zecBalanceCard.setAttribute('aria-label','Start or stop the Today Earned card spin');
+  zecBalanceCard.setAttribute('title','Tap to start or stop the Today Earned card spin');
   const toggleZecBalanceSpin=()=>{
     const spinning=zecBalanceCard.classList.toggle('zec-spin-active');
     zecBalanceCard.setAttribute('aria-pressed',String(spinning));
