@@ -192,7 +192,61 @@
 .cards .card.stat.zec-spin-active::after{animation:zecShine 2.8s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.cards .card.stat.zec-spin-active{animation:zecBalanceSlowSpin 12s linear infinite,zecEdgeShine 2.8s ease-in-out infinite}}
 </style>
-</head><body><div class="app"><aside class="sidebar" id="sidebar"><div class="logo">ZEC<span>BOX</span></div><nav class="nav"><button class="active" id="dashboardNav">◈ Dashboard</button><button id="earnNav">✦ Earn from Ads</button><button id="withdrawNav">↗ Withdraw</button><button id="referralNav">♧ Referrals</button><button id="mysteryNav">✧ Mystery Box</button><button id="walletNav">▣ Wallet</button><button id="activityNav">≡ Activity</button><button id="accountNav">◎ Account</button><button id="createAdNav">＋ Create Ad</button></nav></aside><main class="main"><header class="top"><div><div class="eyebrow">Welcome back</div><div class="title">Watch. Earn. Repeat.</div><div class="welcome-sub">Get rewarded for every ad you watch.</div></div><div><button class="menu secondary" id="menuBtn">☰</button> <button class="user" id="accountBtn">ZEC User</button></div></header><section class="cards"><div class="card balance"><div class="zec-rain" aria-hidden="true"><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span></div><div class="label">Available Balance</div><div class="amount" id="balance">0 ZEC</div><div class="usd" id="usd">$0.00 USD</div></div><div class="card stat"><div class="label">Today Earned</div><strong id="today">0 ZEC</strong></div></section><section class="section" id="earnSection"><h2>Start earning</h2><div class="card earn-card"><div style="display:flex;gap:16px;align-items:center"><div class="earn-icon">▶</div><div class="earn-info"><h3>Earn from Ads</h3><p>Open an ad link in a new tab. Up to five ad visits are available each day.</p></div></div><div class="earn-right"><strong id="adCount">0 / 5 ads today</strong><button class="primary" id="watchAdBtn">Watch Ad</button></div></div></section><section class="section" id="advertiserSection">
+
+<style>
+/* ZEC BOX ambient floating coin background — independent of dashboard cards */
+@keyframes zecBgDrift {
+  0%,100% { transform: translate3d(0,0,0) rotateY(0deg) rotateZ(-8deg); }
+  50% { transform: translate3d(12px,-18px,0) rotateY(180deg) rotateZ(8deg); }
+}
+@keyframes zecBgDriftAlt {
+  0%,100% { transform: translate3d(0,0,0) rotateY(0deg) rotateZ(8deg); }
+  50% { transform: translate3d(-10px,14px,0) rotateY(180deg) rotateZ(-8deg); }
+}
+.zec-floating-background {
+  position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  contain:strict; opacity:.42;
+}
+.zec-floating-background .zec-bg-coin {
+  position:absolute; display:grid; place-items:center; border-radius:50%;
+  width:clamp(22px,2.7vw,38px); aspect-ratio:1;
+  color:#d9c7ff; font:800 10px/1 'Space Grotesk',sans-serif;
+  border:1px solid rgba(196,181,253,.48);
+  background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.22),transparent 35%),linear-gradient(145deg,rgba(124,58,237,.42),rgba(36,24,64,.5) 55%,rgba(167,139,250,.3));
+  box-shadow:inset 0 0 0 3px rgba(196,181,253,.08),0 5px 18px rgba(0,0,0,.18);
+  transform-style:preserve-3d; animation:zecBgDrift 9s ease-in-out infinite;
+}
+.zec-floating-background .zec-bg-coin::after {
+  content:""; position:absolute; inset:4px; border:1px solid rgba(221,214,254,.25); border-radius:50%;
+}
+.zec-floating-background .zec-bg-coin:nth-child(3n) { animation-name:zecBgDriftAlt; animation-duration:12s; }
+.zec-floating-background .zec-bg-coin:nth-child(4n) { width:clamp(16px,1.9vw,27px); opacity:.72; animation-duration:10s; }
+.zec-floating-background .zec-bg-coin:nth-child(5n) { width:clamp(28px,3.2vw,44px); opacity:.8; animation-duration:14s; }
+.zec-floating-background .zec-bg-coin:nth-child(1) {left:5%;top:13%;animation-delay:-2s}
+.zec-floating-background .zec-bg-coin:nth-child(2) {left:18%;top:38%;animation-delay:-7s}
+.zec-floating-background .zec-bg-coin:nth-child(3) {left:31%;top:17%;animation-delay:-4s}
+.zec-floating-background .zec-bg-coin:nth-child(4) {left:44%;top:68%;animation-delay:-8s}
+.zec-floating-background .zec-bg-coin:nth-child(5) {left:57%;top:28%;animation-delay:-5s}
+.zec-floating-background .zec-bg-coin:nth-child(6) {left:69%;top:76%;animation-delay:-1s}
+.zec-floating-background .zec-bg-coin:nth-child(7) {left:81%;top:16%;animation-delay:-9s}
+.zec-floating-background .zec-bg-coin:nth-child(8) {left:92%;top:48%;animation-delay:-3s}
+.zec-floating-background .zec-bg-coin:nth-child(9) {left:11%;top:83%;animation-delay:-6s}
+.zec-floating-background .zec-bg-coin:nth-child(10) {left:38%;top:45%;animation-delay:-10s}
+.zec-floating-background .zec-bg-coin:nth-child(11) {left:63%;top:9%;animation-delay:-2.5s}
+.zec-floating-background .zec-bg-coin:nth-child(12) {left:75%;top:54%;animation-delay:-11s}
+.zec-floating-background .zec-bg-coin:nth-child(13) {left:25%;top:69%;animation-delay:-5.5s}
+.zec-floating-background .zec-bg-coin:nth-child(14) {left:51%;top:88%;animation-delay:-7.5s}
+.app { position:relative; z-index:1; }
+@media(max-width:800px) {
+  .zec-floating-background { opacity:.32; }
+  .zec-floating-background .zec-bg-coin { width:23px; }
+  .zec-floating-background .zec-bg-coin:nth-child(4n) { width:17px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .zec-floating-background .zec-bg-coin { animation:none!important; }
+}
+</style>
+</head><body><div class="zec-floating-background" aria-hidden="true"><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span><span class="zec-bg-coin">Z</span></div><div class="app"><aside class="sidebar" id="sidebar"><div class="logo">ZEC<span>BOX</span></div><nav class="nav"><button class="active" id="dashboardNav">◈ Dashboard</button><button id="earnNav">✦ Earn from Ads</button><button id="withdrawNav">↗ Withdraw</button><button id="referralNav">♧ Referrals</button><button id="mysteryNav">✧ Mystery Box</button><button id="walletNav">▣ Wallet</button><button id="activityNav">≡ Activity</button><button id="accountNav">◎ Account</button><button id="createAdNav">＋ Create Ad</button></nav></aside><main class="main"><header class="top"><div><div class="eyebrow">Welcome back</div><div class="title">Watch. Earn. Repeat.</div><div class="welcome-sub">Get rewarded for every ad you watch.</div></div><div><button class="menu secondary" id="menuBtn">☰</button> <button class="user" id="accountBtn">ZEC User</button></div></header><section class="cards"><div class="card balance"><div class="zec-rain" aria-hidden="true"><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span><span class="zec-coin">Z</span></div><div class="label">Available Balance</div><div class="amount" id="balance">0 ZEC</div><div class="usd" id="usd">$0.00 USD</div></div><div class="card stat"><div class="label">Today Earned</div><strong id="today">0 ZEC</strong></div></section><section class="section" id="earnSection"><h2>Start earning</h2><div class="card earn-card"><div style="display:flex;gap:16px;align-items:center"><div class="earn-icon">▶</div><div class="earn-info"><h3>Earn from Ads</h3><p>Open an ad link in a new tab. Up to five ad visits are available each day.</p></div></div><div class="earn-right"><strong id="adCount">0 / 5 ads today</strong><button class="primary" id="watchAdBtn">Watch Ad</button></div></div></section><section class="section" id="advertiserSection">
 <div class="advertiser-close-row"><button class="secondary" id="closeAdvertiser">Close Advertiser Center</button></div>
 <div class="section-head"><div><h2>Advertiser Center</h2><p class="section-sub">Create campaigns and reach ZEC BOX users.</p></div></div>
 <div class="ad-manager"><div class="ad-form-card"><div class="form-title">Create an Ad Campaign</div><div class="form-grid">
